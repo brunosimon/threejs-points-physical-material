@@ -108,6 +108,21 @@ export default function(_parameters = {})
         // defines.ENVMAP_BLENDING_ADD = '' // ???
     }
 
+    if(_parameters.fogColor)
+    {
+        uniforms.fogColor.value = _parameters.fogColor
+        uniforms.fogNear.value = _parameters.fogNear
+        uniforms.fogFar.value = _parameters.fogFar
+        uniforms.fogDensity.value = _parameters.fogDensity
+
+        defines.USE_FOG = ''
+
+        if(_parameters.fogDensity)
+        {
+            defines.FOG_EXP2 = ''
+        }
+    }
+
     if(_parameters.color)
     {
         uniforms.diffuse.value = _parameters.color

@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import BrushParticlesMaterial from './Materials/BrushParticlesMaterial.js'
+import PointsPhysicalMaterial from './Materials/PointsPhysicalMaterial.js'
 
 export default class World
 {
@@ -185,9 +185,9 @@ export default class World
 
         // Options
         this.brushParticles.options = [
-            { name: 'a', geometry: new THREE.SphereGeometry(0.5, 20, 20), position: new THREE.Vector3(- 2, 0, 0), color: 0x100200, roughness: 0.236, metalness: 1, envMapIntensity: 15 },
-            { name: 'b', geometry: new THREE.SphereGeometry(0.5, 20, 20), position: new THREE.Vector3(0, 0, 0), color: 0x224466, roughness: 0.636, metalness: 0, envMapIntensity: 1.7 },
-            { name: 'c', geometry: new THREE.SphereGeometry(0.5, 20, 20), position: new THREE.Vector3(2, 0, 0), color: 0x91971f, roughness: 0.563, metalness: 0, envMapIntensity: 1.4 }
+            { name: 'a', geometry: new THREE.SphereGeometry(0.5, 15, 15), position: new THREE.Vector3(- 2, 0, 0), color: 0x100200, roughness: 0.236, metalness: 1, envMapIntensity: 15 },
+            { name: 'b', geometry: new THREE.SphereGeometry(0.5, 15, 15), position: new THREE.Vector3(0, 0, 0), color: 0x224466, roughness: 0.636, metalness: 0, envMapIntensity: 1.7 },
+            { name: 'c', geometry: new THREE.SphereGeometry(0.5, 15, 15), position: new THREE.Vector3(2, 0, 0), color: 0x91971f, roughness: 0.563, metalness: 0, envMapIntensity: 1.4 }
         ]
 
         /**
@@ -225,14 +225,16 @@ export default class World
             /**
              * Material
              */
-            item.material = new BrushParticlesMaterial({
+            item.material = new PointsPhysicalMaterial({
                 color: new THREE.Color(_options.color),
                 roughness: _options.roughness,
                 metalness: _options.metalness,
                 envMap: this.environmentMap,
                 envMapIntensity: _options.envMapIntensity,
                 brushTexture: this.brushParticles.brushTexture,
-                usePoints: this.brushParticles.usePoints
+                usePoints: this.brushParticles.usePoints,
+                fogColor: new THREE.Color(0x0f0914),
+                fogDensity: 0.15
             })
 
             /**
