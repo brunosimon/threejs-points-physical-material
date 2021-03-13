@@ -15,7 +15,7 @@ export default class Camera
         this.interactionTarget = _options.interactionTarget
 
         // Set up
-        this.mode = 'debugCamera'
+        this.mode = 'defaultCamera'
 
         // if(!this.debug)
         // {

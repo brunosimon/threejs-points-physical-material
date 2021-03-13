@@ -40,7 +40,7 @@ export default class Controls
         this.player.eyeSight = {}
         this.player.eyeSight.standing = 1.65
         this.player.eyeSight.crouching = 1
-        this.player.eyeSight.value = Ola({ y: this.player.eyeSight.standing }, 1000)
+        this.player.eyeSight.value = Ola({ y: this.player.eyeSight.standing }, 300)
     }
 
     setDrag()

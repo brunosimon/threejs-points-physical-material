@@ -12,6 +12,8 @@ import Physics from './Physics.js'
 import Controls from './Controls.js'
 import World from './World.js'
 import Fullscreen from './Fullscreen.js'
+import Resources from './Resources.js'
+import assets from './assets.js'
 
 export default class Application
 {
@@ -36,13 +38,13 @@ export default class Application
         this.setConfig()
         this.setDebug()
         this.setStats()
+        this.setResources()
         this.setScene()
         this.setCamera()
         this.setRenderer()
         this.setPhysics()
         this.setFullscreen()
         this.setControls()
-        this.setWorld()
 
         this.time.on('tick', () =>
         {
@@ -118,6 +120,27 @@ export default class Application
     }
 
     /**
+     * Set resources
+     */
+    setResources()
+    {
+        this.resources = new Resources(assets)
+
+        this.resources.on('progress', (_group, _resource, _data) =>
+        {
+        })
+
+        this.resources.on('groupEnd', (_group) =>
+        {
+        })
+
+        this.resources.on('end', (_group) =>
+        {
+            this.setWorld()
+        })
+    }
+
+    /**
      * Set scene
      */
     setScene()
@@ -190,7 +213,10 @@ export default class Application
         this.camera.update()
         this.physics.update()
         this.controls.update()
-        this.world.update()
+        if(this.world)
+        {
+            this.world.update()
+        }
         this.renderer.update()
     }
 }

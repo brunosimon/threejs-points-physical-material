@@ -15,7 +15,7 @@ export default function(_parameters = {})
     const uniforms = THREE.UniformsUtils.merge([
         THREE.ShaderLib[ 'standard'].uniforms,
         {
-            uSize: { value: 500 }
+            uSize: { value: 300 }
         }
     ])
 
