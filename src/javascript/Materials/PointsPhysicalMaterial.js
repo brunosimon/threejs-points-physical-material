@@ -1,6 +1,6 @@
 import * as THREE from 'three'
-import shaderFragment from '../shaders/brushParticles/fragment.glsl'
-import shaderVertex from '../shaders/brushParticles/vertex.glsl'
+import shaderFragment from '../shaders/pointsPhysical/fragment.glsl'
+import shaderVertex from '../shaders/pointsPhysical/vertex.glsl'
 
 /**
  * TODO:
@@ -15,7 +15,7 @@ export default function(_parameters = {})
     const uniforms = THREE.UniformsUtils.merge([
         THREE.ShaderLib[ 'standard'].uniforms,
         {
-            uSize: { value: 300 }
+            uSize: { value: null }
         }
     ])
 
@@ -39,6 +39,11 @@ export default function(_parameters = {})
     if(_parameters.usePoints)
     {
         defines.USE_POINTS = ''
+    }
+
+    if(_parameters.size)
+    {
+        uniforms.uSize.value = _parameters.size
     }
 
     if(_parameters.map)
@@ -107,6 +112,8 @@ export default function(_parameters = {})
         // defines.ENVMAP_BLENDING_MIX = '' // ???
         // defines.ENVMAP_BLENDING_ADD = '' // ???
     }
+
+    // defines.USE_SHADOWMAP = ''
 
     if(_parameters.fogColor)
     {

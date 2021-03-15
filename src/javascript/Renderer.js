@@ -66,6 +66,8 @@ export default class Renderer
         this.instance.outputEncoding = THREE.sRGBEncoding
         // this.instance.autoClear = false
 
+        this.instance.shadowMap.enabled = true
+
         // Add stats panel
         this.stats.setRenderPanel(this.instance.getContext())
 

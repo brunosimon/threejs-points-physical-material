@@ -15,7 +15,7 @@ export default class Camera
         this.interactionTarget = _options.interactionTarget
 
         // Set up
-        this.mode = 'defaultCamera'
+        this.mode = 'debugCamera'
 
         // if(!this.debug)
         // {
@@ -28,7 +28,7 @@ export default class Camera
             this.debug.Register({
                 type: 'folder',
                 label: 'camera',
-                open: false
+                open: true
             })
 
             this.debug.Register({
@@ -50,6 +50,30 @@ export default class Camera
                         this.defaultCamera.deactivate()
                         this.debugCamera.activate()
                     }
+                }
+            })
+
+            this.debug.Register({
+                folder: 'camera',
+                type: 'button',
+                label: 'points',
+                object: this,
+                action: () =>
+                {
+                    this.instance.layers.enable(0)
+                    this.instance.layers.disable(1)
+                }
+            })
+
+            this.debug.Register({
+                folder: 'camera',
+                type: 'button',
+                label: 'meshes',
+                object: this,
+                action: () =>
+                {
+                    this.instance.layers.enable(1)
+                    this.instance.layers.disable(0)
                 }
             })
         }

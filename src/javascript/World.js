@@ -30,7 +30,12 @@ export default class World
 
         this.setEnvironmentMap()
         this.setLights()
-        this.setBrushParticles()
+        /**
+         * Brush texture
+         */
+        const textureLoader = new THREE.TextureLoader()
+        this.brushTexture = textureLoader.load('/textures/brushes/brush3.png')
+
         this.setModel()
     }
 
@@ -73,6 +78,7 @@ export default class World
         this.lights.ambientLight = {}
         this.lights.ambientLight.color = '#ff0000'
         this.lights.ambientLight.instance = new THREE.AmbientLight(this.lights.ambientLight.color, 0.2)
+        this.lights.ambientLight.instance.layers.enableAll()
         this.scene.add(this.lights.ambientLight.instance)
 
         // Debug
@@ -108,10 +114,22 @@ export default class World
         this.lights.directionalLight = {}
         this.lights.directionalLight.color = '#ffffff'
         this.lights.directionalLight.instance = new THREE.DirectionalLight(this.lights.directionalLight.color, 5)
-        this.lights.directionalLight.instance.position.x = 10
-        this.lights.directionalLight.instance.position.y = 10
-        this.lights.directionalLight.instance.position.z = 10
+        this.lights.directionalLight.instance.position.x = 3
+        this.lights.directionalLight.instance.position.y = 3
+        this.lights.directionalLight.instance.position.z = 3
+        this.lights.directionalLight.instance.castShadow = true
+        this.lights.directionalLight.instance.shadow.mapSize.width = 512
+        this.lights.directionalLight.instance.shadow.mapSize.height = 512
+        this.lights.directionalLight.instance.shadow.camera.near = 0.5
+        this.lights.directionalLight.instance.shadow.camera.far = 500
+        this.lights.directionalLight.instance.shadow.bias = - 0.0001
+        this.lights.directionalLight.instance.shadow.normalBias = - 0.0001
+        this.lights.directionalLight.instance.layers.enableAll()
         this.scene.add(this.lights.directionalLight.instance)
+
+        // // Helper
+        // this.lights.directionalLightHelper = new THREE.CameraHelper(this.lights.directionalLight.instance.shadow.camera)
+        // this.scene.add(this.lights.directionalLightHelper)
 
         // Debug
         if(this.debug)
@@ -141,202 +159,13 @@ export default class World
         }
     }
 
-    setBrushParticles()
-    {
-        this.brushParticles = {}
-
-        /**
-         * Use points
-         */
-        this.brushParticles.usePoints = true
-
-        if(this.debug)
-        {
-            this.debug.Register({
-                folder: 'world',
-                type: 'checkbox',
-                label: 'usePoints',
-                object: this.brushParticles,
-                property: 'usePoints',
-                onChange: () =>
-                {
-                    for(const _item of this.brushParticles.items)
-                    {
-                        if(this.brushParticles.usePoints)
-                        {
-                            _item.material.defines.USE_POINTS = ''
-                            _item.material.needsUpdate = true
-            
-                            this.scene.remove(_item.mesh)
-                            this.scene.add(_item.points)
-                        }
-                        else
-                        {
-                            delete _item.material.defines.USE_POINTS
-                            _item.material.needsUpdate = true
-            
-                            this.scene.add(_item.mesh)
-                            this.scene.remove(_item.points)
-                        }
-                    }
-                }
-            })
-        }
-
-        /**
-         * Brush texture
-         */
-        const textureLoader = new THREE.TextureLoader()
-        this.brushParticles.brushTexture = textureLoader.load('/textures/brushes/brush3.png')
-
-        // Options
-        this.brushParticles.options = [
-            { name: 'a', geometry: new THREE.SphereGeometry(0.5, 15, 15), position: new THREE.Vector3(- 2, 0, 0), color: 0x100200, roughness: 0.236, metalness: 1, envMapIntensity: 15 },
-            { name: 'b', geometry: new THREE.SphereGeometry(0.5, 15, 15), position: new THREE.Vector3(0, 0, 0), color: 0x224466, roughness: 0.636, metalness: 0, envMapIntensity: 1.7 },
-            { name: 'c', geometry: new THREE.SphereGeometry(0.5, 15, 15), position: new THREE.Vector3(2, 0, 0), color: 0x91971f, roughness: 0.563, metalness: 0, envMapIntensity: 1.4 }
-        ]
-
-        /**
-         * Items
-         */
-        this.brushParticles.items = []
-
-        for(const _options of this.brushParticles.options)
-        {
-            const item = {}
-            item.options = _options
-
-            /**
-             * Geometry
-             */
-            item.geometry = _options.geometry
-            const verticesCount = item.geometry.attributes.position.count
-
-            for(let i = 0; i < verticesCount; i++)
-            {
-                item.geometry.attributes.position.array[i * 3 + 0] += (Math.random() - 0.5) * 0
-                item.geometry.attributes.position.array[i * 3 + 1] += (Math.random() - 0.5) * 0
-                item.geometry.attributes.position.array[i * 3 + 2] += (Math.random() - 0.5) * 0
-            }
-
-            const uvRotation = new Float32Array(verticesCount)
-            for(let i = 0; i < verticesCount; i++)
-            {
-                uvRotation[i] = Math.random() * Math.PI * 2
-            }
-            item.geometry.setAttribute('aUvRotation', new THREE.BufferAttribute(uvRotation, 1))
-
-            // item.geometry.setAttribute('uv2', new THREE.BufferAttribute(item.geometry.attributes.uv.array, 2))
-
-            /**
-             * Material
-             */
-            item.material = new PointsPhysicalMaterial({
-                color: new THREE.Color(_options.color),
-                roughness: _options.roughness,
-                metalness: _options.metalness,
-                envMap: this.environmentMap,
-                envMapIntensity: _options.envMapIntensity,
-                brushTexture: this.brushParticles.brushTexture,
-                usePoints: this.brushParticles.usePoints,
-                fogColor: new THREE.Color(0x0f0914),
-                fogDensity: 0.15
-            })
-
-            /**
-             * Object
-             */
-            // Points
-            item.points = new THREE.Points(item.geometry, item.material)
-            item.points.position.copy(_options.position)
-            this.scene.add(item.points)
-    
-            // Mesh
-            item.mesh = new THREE.Mesh(item.geometry, item.material)
-            item.mesh.position.copy(_options.position)
-
-            /**
-             * Debug
-             */
-            if(this.debug)
-            {
-                this.debug.Register({
-                    type: 'folder',
-                    folder: 'world',
-                    label: _options.name,
-                    open: true
-                })
-
-                this.debug.Register({
-                    folder: _options.name,
-                    type: 'range',
-                    label: 'uSize',
-                    min: 0,
-                    max: 1000,
-                    step: 1,
-                    object: item.material.uniforms.uSize,
-                    property: 'value'
-                })
-
-                this.debug.Register({
-                    folder: _options.name,
-                    type: 'range',
-                    label: 'roughness',
-                    min: 0,
-                    max: 1,
-                    step: 0.001,
-                    object: item.material.uniforms.roughness,
-                    property: 'value'
-                })
-
-                this.debug.Register({
-                    folder: _options.name,
-                    type: 'range',
-                    label: 'metalness',
-                    min: 0,
-                    max: 1,
-                    step: 0.001,
-                    object: item.material.uniforms.metalness,
-                    property: 'value'
-                })
-
-                this.debug.Register({
-                    folder: _options.name,
-                    type: 'range',
-                    label: 'envMapIntensity',
-                    min: 0,
-                    max: 50,
-                    step: 0.1,
-                    object: item.material.uniforms.envMapIntensity,
-                    property: 'value'
-                })
-
-                this.debug.Register({
-                    type: 'color',
-                    folder: _options.name,
-                    label: 'color',
-                    object: _options,
-                    property: 'color',
-                    format: 'hex',
-                    onChange: () =>
-                    {
-                        item.material.uniforms.diffuse.value.set(_options.color)
-                    }
-                })
-            }
-
-            /**
-             * Save
-             */
-            this.brushParticles.items.push(item)
-        }
-    }
-
     setModel()
     {
         this.model = {}
         this.model.resource = this.resources.items.worldModel.scene
         // this.scene.add(this.model.resource)
+
+        const all = []
 
         this.model.resource.traverse((_child) =>
         {
@@ -365,27 +194,42 @@ export default class World
                 // Material
                 const oldMaterial = _child.material
                 const material = new PointsPhysicalMaterial({
+                    size: 300,
                     color: oldMaterial.color,
                     roughness: oldMaterial.roughness,
                     metalness: oldMaterial.metalness,
                     envMap: this.environmentMap,
                     envMapIntensity: oldMaterial.envMapIntensity,
-                    brushTexture: this.brushParticles.brushTexture,
+                    brushTexture: this.brushTexture,
                     usePoints: true,
-                    fogColor: new THREE.Color(0x0f0914),
-                    fogDensity: 0.15
+                    // fogColor: new THREE.Color(0x0f0914),
+                    // fogDensity: 0
                 })
 
                 // Points
                 const points = new THREE.Points(geometry, material)
+                points.castShadow = true
+                points.receiveShadow = true
                 points.position.copy(_child.position)
                 points.scale.copy(_child.scale)
                 points.quaternion.copy(_child.quaternion)
+                points.layers.set(0)
 
-                // Replace mesh by points
-                this.scene.add(points)
+                // Mesh
+                _child.castShadow = true
+                _child.receiveShadow = true
+                _child.layers.set(1)
+
+                // Add to the scene
+                all.push(points)
+                all.push(_child)
             }
         })
+
+        for(const _object of all)
+        {
+            this.scene.add(_object)
+        }
     }
 
     mergeVertices(geometry, tolerance = 1e-4)

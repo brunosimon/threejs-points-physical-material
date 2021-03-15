@@ -113,10 +113,7 @@ export default class Application
      */
     setStats()
     {
-        if(this.config.debug)
-        {
-            this.stats = new Stats()
-        }
+        this.stats = new Stats(true)
     }
 
     /**
